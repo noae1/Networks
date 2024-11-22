@@ -30,7 +30,7 @@ def authenticate_user(client_socket):
             if "User:" not in login_message or "Password:" not in login_message:
                 print("Invalid login format. Closing connection.")
                 return False
-
+            
             client_socket.send(login_message.encode('utf-8'))
 
             data = client_socket.recv(1024).decode('utf-8')
