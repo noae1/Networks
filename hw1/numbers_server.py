@@ -6,7 +6,7 @@ import math
 
 
 def close_socket(reason, sock, socket_list, authenticated_sockets):
-    sock.send((f"{reason}, closing socket").encode())
+    sock.send(f"{reason}, closing socket".encode())
     sock.close()
     authenticated_sockets.remove(sock)
     socket_list.remove(sock)
@@ -25,7 +25,7 @@ def handle_user_login(msg, sock, authenticated_sockets, socket_list, users_dict)
     password = lines[1].split(":")[1][1:]
     if user in users_dict:
         if users_dict[user] == password:
-            sock.send((f"Hi {user}, good to see you.").encode())
+            sock.send(f"Hi {user}, good to see you.".encode())
             authenticated_sockets.append(sock)
         else:
             sock.send("Failed to login.".encode())
@@ -59,9 +59,15 @@ def handle_calculation(msg, sock, authenticated_sockets, socket_list):
             sock.send("error: result is too big".encode())
             return
         
-        result = int(result) if result.is_integer() else round(result, 2)
+        # Check if result is float and is an integer
+        if isinstance(result, float) and result.is_integer():
+            result = int(result)  # Convert float to integer if it's a whole number
+        else:
+            result = round(result, 2)  # Round to 2 decimal places otherwise
+
         sock.send((f"response: {result}.").encode())
-    except:
+    except Exception as e:
+        print(str(e))
         close_socket("Invalid calculation", sock, socket_list, authenticated_sockets)
 
 def handle_maximum(msg, sock, authenticated_sockets, socket_list):
